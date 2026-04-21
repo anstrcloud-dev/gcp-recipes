@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+application_default_credentials.json
+.vs/
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.egg-info/
+venv/
+env/
