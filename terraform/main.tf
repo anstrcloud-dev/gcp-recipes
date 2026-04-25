@@ -14,20 +14,21 @@ location      = var.region
 
 
 # Cloud Run
-resource "google_cloud_run_service" "gcp-recipes" { 
-name = "recipe-app" 
-location = var.region 
-template {
- spec{ 
-containers { 
-image = var.image_path
- } 
-} 
-}
- traffic { 
-percent = 100 
-latest_revision = true 
-} 
+resource "google_cloud_run_service" "gcp-recipes" {
+  name     = "recipe-app"
+  location = var.region
+  template {
+    spec {
+      service_account_name = google_service_account.service_account.email
+      containers {
+        image = var.image_path
+      }
+    }
+  }
+  traffic {
+    percent         = 100
+    latest_revision = true
+  }
 }
 
 # for unauthenticated access
@@ -36,4 +37,23 @@ resource "google_cloud_run_service_iam_member" "public_access" {
   location = var.region
   role     = "roles/run.invoker"
   member   = "allUsers"
+}
+
+
+# Service Account
+resource "google_service_account" "service_account" {
+  account_id   = "recipe-app-sa"
+  display_name = "Recipe App"
+}
+
+resource "google_project_iam_member" "firestore_access" {
+  project = var.project_id
+  role    = "roles/datastore.user"
+  member  = "serviceAccount:${google_service_account.service_account.email}"
+}
+
+resource "google_project_iam_member" "secret_access" {
+  project = var.project_id
+  role    = "roles/secretmanager.secretAccessor"
+  member  = "serviceAccount:${google_service_account.service_account.email}"
 }
