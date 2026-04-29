@@ -57,3 +57,11 @@ resource "google_project_iam_member" "secret_access" {
   role    = "roles/secretmanager.secretAccessor"
   member  = "serviceAccount:${google_service_account.service_account.email}"
 }
+
+resource "google_secret_manager_secret" "secret-flask-key" {
+  secret_id = "flask-secret-key"
+
+  replication {
+    auto {}
+  }
+}
